@@ -1,0 +1,26 @@
+name: Generate CCE policy
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - cce/vote-template.json
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install confcom
+        run: az extension add -n confcom -y
+      - name: Generate policy for the confidential vote group
+        run: |
+          az confcom acipolicygen -a cce/vote-template.json \
+            --approve-wildcards --enable-stdio --platform linux/amd64 \
+            --print-policy > cce/vote-ccepolicy.b64
+          test -s cce/vote-ccepolicy.b64
+          wc -c cce/vote-ccepolicy.b64
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vote-ccepolicy
+          path: cce/vote-ccepolicy.b64

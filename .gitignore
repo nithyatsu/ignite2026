@@ -1,0 +1,3 @@
+sp.json
+*.json.bak
+.env.local
